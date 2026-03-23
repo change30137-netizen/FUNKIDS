@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FUNKIDS App Demo</title>
+    <title>FUNKIDS 家長端 App Demo</title>
     <!-- 載入必要函式庫 (CDN) -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -14,19 +14,20 @@
     <style>
         body { 
             font-family: 'Noto Sans TC', sans-serif; 
-            overscroll-behavior: none; /* 防止手機下拉重新整理影響體驗 */
+            overscroll-behavior: none;
+            background-color: #f3f4f6;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 針對行動裝置優化高度，確保底部不被瀏覽器工具列擋住 */
         .app-container {
             height: 100vh;
             height: 100dvh; 
         }
+        .active-tab { color: #FF8E72; }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -39,7 +40,6 @@
             return () => clearTimeout(timer);
           }, []);
 
-          // 當分頁切換或載入完成時，重新初始化 Lucide 圖示
           React.useEffect(() => {
             if (!loading) {
               lucide.createIcons();
@@ -50,9 +50,9 @@
             return (
               <div className="flex items-center justify-center app-container bg-[#FFFDF9] max-w-md mx-auto shadow-2xl">
                 <div className="text-center">
-                  <div className="w-16 h-16 border-4 border-[#FF8E72] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-[#FF8E72] font-black tracking-widest text-xl">FUNKIDS</p>
-                  <p className="text-gray-400 text-xs mt-2 font-bold tracking-tight">系統安全載入中</p>
+                  <div className="w-20 h-20 border-4 border-[#FF8E72] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                  <h1 className="text-[#FF8E72] font-black text-2xl tracking-widest">FUNKIDS</h1>
+                  <p className="text-gray-400 text-sm mt-2 font-bold">為您的孩子開啟精彩生活</p>
                 </div>
               </div>
             );
@@ -61,177 +61,169 @@
           return (
             <div className="max-w-md mx-auto app-container bg-[#FFFDF9] shadow-2xl flex flex-col relative overflow-hidden">
               
-              {/* 頂端 Logo 與 通知 - 調整間距以補足移除狀態列後的空間 */}
-              <header className="px-6 pt-8 pb-4 flex justify-between items-center bg-[#FFFDF9] z-10">
-                <div>
+              {/* 頂部搜尋與 Logo */}
+              <header className="px-6 pt-10 pb-4 bg-[#FFFDF9] z-10">
+                <div className="flex justify-between items-center mb-4">
                   <h1 className="text-2xl font-black tracking-tighter text-[#FF8E72]">FUNKIDS</h1>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Parenting Management</p>
-                </div>
-                <div className="flex gap-3">
-                  <button className="p-2.5 bg-white rounded-full shadow-sm border border-gray-100 active:scale-90 transition">
-                    <i data-lucide="bell" className="w-5 h-5 text-gray-600"></i>
-                  </button>
-                  <div className="w-11 h-11 rounded-full bg-orange-100 border-2 border-white shadow-sm overflow-hidden active:scale-95 transition">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Amy" alt="Avatar" />
+                  <div className="flex gap-3">
+                    <button className="p-2 bg-gray-50 rounded-full active:scale-90 transition">
+                      <i data-lucide="bell" className="w-5 h-5 text-gray-500"></i>
+                    </button>
+                    <button className="p-2 bg-gray-50 rounded-full active:scale-90 transition">
+                      <i data-lucide="heart" className="w-5 h-5 text-gray-500"></i>
+                    </button>
                   </div>
+                </div>
+                <div className="relative group">
+                  <i data-lucide="search" className="absolute left-4 top-3.5 w-5 h-5 text-gray-400"></i>
+                  <input 
+                    type="text" 
+                    placeholder="想帶孩子去哪裡玩？" 
+                    className="w-full bg-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E72] transition-all"
+                  />
                 </div>
               </header>
 
-              {/* 主要視圖內容區 - 使用 flex-1 確保佔滿剩餘空間並可滾動 */}
-              <main className="flex-1 overflow-y-auto px-6 pb-24 no-scrollbar">
-                {activeTab === 'home' && <HomeView />}
-                {activeTab === 'manage' && <ManageView />}
-                {activeTab === 'store' && <StoreView />}
-                {activeTab === 'wallet' && <WalletView />}
-                {activeTab === 'profile' && <ProfilePlaceholder />}
+              {/* 主要視圖內容區 */}
+              <main className="flex-1 overflow-y-auto px-6 pb-28 no-scrollbar">
+                {activeTab === 'home' && <CustomerHome />}
+                {activeTab === 'explore' && <ExploreView />}
+                {activeTab === 'orders' && <OrdersView />}
+                {activeTab === 'profile' && <ProfileView />}
               </main>
 
-              {/* 底部導航選單 - 使用 fixed 或正確的 flex 佈局確保始終在最底部 */}
+              {/* 底部導航選單 (家長端) */}
               <nav className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-6 pt-4 pb-8 flex justify-between items-center z-20">
                 <NavBtn id="home" icon="home" label="首頁" active={activeTab} set={setActiveTab} />
-                <NavBtn id="manage" icon="layout-dashboard" label="管理" active={activeTab} set={setActiveTab} />
-                <NavBtn id="store" icon="store" label="市場" active={activeTab} set={setActiveTab} />
-                <NavBtn id="wallet" icon="wallet" label="帳務" active={activeTab} set={setActiveTab} />
+                <NavBtn id="explore" icon="compass" label="探索" active={activeTab} set={setActiveTab} />
+                <NavBtn id="orders" icon="shopping-bag" label="訂單" active={activeTab} set={setActiveTab} />
                 <NavBtn id="profile" icon="user" label="我的" active={activeTab} set={setActiveTab} />
               </nav>
             </div>
           );
         };
 
-        // --- 子頁面組件 ---
+        // --- 家長首頁視圖 ---
+        const CustomerHome = () => (
+          <div className="space-y-8 pt-2 animate-in fade-in duration-500">
+            {/* 快速分類 */}
+            <div className="grid grid-cols-4 gap-4">
+              <CategoryBtn icon="utensils" label="食" color="bg-orange-100" text="text-orange-500" />
+              <CategoryBtn icon="shirt" label="衣" color="bg-blue-100" text="text-blue-500" />
+              <CategoryBtn icon="home" label="住" color="bg-green-100" text="text-green-500" />
+              <CategoryBtn icon="car" label="行" color="bg-purple-100" text="text-purple-500" />
+              <CategoryBtn icon="graduation-cap" label="育" color="bg-yellow-100" text="text-yellow-500" />
+              <CategoryBtn icon="palmtree" label="樂" color="bg-pink-100" text="text-pink-500" />
+              <CategoryBtn icon="ticket" label="票券" color="bg-cyan-100" text="text-cyan-500" />
+              <CategoryBtn icon="more-horizontal" label="更多" color="bg-gray-100" text="text-gray-500" />
+            </div>
 
-        const HomeView = () => (
-          <div className="space-y-6 pt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-gradient-to-br from-[#FF8E72] to-[#ffb09c] p-6 rounded-[2.5rem] text-white shadow-xl shadow-orange-100">
-              <p className="opacity-80 text-xs font-bold mb-1 uppercase tracking-wider">Hello, Amy!</p>
-              <h2 className="text-3xl font-black mb-4">$12,450</h2>
-              <div className="flex justify-between items-center">
-                <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold">本月累計佣金收益</span>
-                <div className="flex items-center gap-1 text-[10px] font-bold">
-                  <i data-lucide="trending-up" className="w-3 h-3"></i> +12.5%
+            {/* 廣告 Banner */}
+            <div className="bg-gradient-to-br from-[#FF8E72] to-[#ffb09c] rounded-[2.5rem] p-6 text-white shadow-xl relative overflow-hidden">
+                <div className="relative z-10">
+                    <p className="text-[10px] font-black tracking-widest uppercase mb-1">特別推薦</p>
+                    <h2 className="text-xl font-black mb-2">夏季水上冒險營</h2>
+                    <p className="text-xs opacity-90 mb-4 leading-relaxed">專業教練帶領，讓孩子在清涼中挑戰自我！</p>
+                    <button className="bg-white text-[#FF8E72] px-6 py-2 rounded-full font-black text-xs shadow-lg">立即探索</button>
                 </div>
-              </div>
+                <i data-lucide="waves" className="absolute -right-4 -bottom-4 w-32 h-32 opacity-20 transform rotate-12"></i>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm active:bg-gray-50 transition">
-                <i data-lucide="calendar" className="w-5 h-5 text-[#FF8E72] mb-3"></i>
-                <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter">本月活動</p>
-                <p className="text-xl font-black">5 檔</p>
-              </div>
-              <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm active:bg-gray-50 transition">
-                <i data-lucide="clock" className="w-5 h-5 text-blue-400 mb-3"></i>
-                <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter">待收款項</p>
-                <p className="text-xl font-black">3 筆</p>
-              </div>
-            </div>
-
+            {/* 精選活動 */}
             <section className="pb-4">
               <div className="flex justify-between items-end mb-4 px-1">
-                <h3 className="font-black text-gray-800 text-lg">熱門推廣項目</h3>
-                <span className="text-[10px] font-bold text-[#FF8E72] bg-orange-50 px-2 py-1 rounded-lg">查看全部</span>
+                <h3 className="font-black text-gray-800 text-lg">大家都在玩</h3>
+                <span className="text-xs font-bold text-[#FF8E72]">查看更多</span>
               </div>
-              <div className="space-y-4">
-                <ActivityCard title="兒童夏日藝術工坊" date="07.15" rate="15%" hot />
-                <ActivityCard title="森林冒險探索營隊" date="08.01" rate="20%" />
+              <div className="grid grid-cols-1 gap-6">
+                <ActivityCard 
+                  img="https://picsum.photos/seed/art/400/250"
+                  title="兒童夏日藝術工坊" 
+                  location="台北市 信義區"
+                  price="800"
+                  tag="藝術教育"
+                />
+                <ActivityCard 
+                  img="https://picsum.photos/seed/forest/400/250"
+                  title="小小森林探險隊" 
+                  location="宜蘭縣 礁溪鄉"
+                  price="1,200"
+                  tag="戶外探索"
+                />
               </div>
             </section>
           </div>
         );
 
-        const ManageView = () => (
-          <div className="space-y-4 pt-2 animate-in fade-in duration-300">
-            <h3 className="font-black text-xl mb-4 text-gray-800">活動進度管理</h3>
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white p-4 rounded-[2rem] border border-gray-50 shadow-sm flex gap-4 items-center active:scale-[0.98] transition">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl overflow-hidden shrink-0">
-                  <img src={`https://picsum.photos/seed/fun${i}/200`} className="w-full h-full object-cover" alt="activity" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm text-gray-800 truncate">小小烘焙家體驗營</h4>
-                  <div className="flex justify-between items-center mt-2 mb-1">
-                    <span className="text-[10px] text-gray-400 font-bold">報名人數: 12/20</span>
-                    <span className="text-[10px] text-[#FF8E72] font-black">60%</span>
-                  </div>
-                  <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-[#FF8E72] h-full transition-all duration-1000" style={{width: '60%'}}></div>
-                  </div>
-                </div>
-                <i data-lucide="chevron-right" className="text-gray-300 w-5 h-5"></i>
-              </div>
-            ))}
-          </div>
-        );
-
-        const StoreView = () => (
-          <div className="space-y-5 pt-2 animate-in fade-in duration-300">
-            <div className="bg-gray-100 rounded-2xl px-4 py-3 flex items-center gap-3">
-              <i data-lucide="search" className="w-4 h-4 text-gray-400"></i>
-              <span className="text-gray-400 text-sm font-medium">搜尋高品質廠商與活動...</span>
-            </div>
-            <div className="grid grid-cols-2 gap-4 pb-4">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-50 shadow-sm active:scale-[0.96] transition group">
-                  <div className="relative overflow-hidden h-28">
-                    <img src={`https://picsum.photos/seed/store${i}/300/200`} className="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="vendor" />
-                  </div>
-                  <div className="p-4">
-                    <p className="font-bold text-xs truncate mb-2">優選品牌廠商</p>
-                    <div className="flex justify-between items-center">
-                        <span className="text-[#FF8E72] font-black text-[10px]">最高 20% 分潤</span>
-                        <i data-lucide="plus-circle" className="w-4 h-4 text-[#FF8E72]"></i>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        // --- 探索視圖 ---
+        const ExploreView = () => (
+          <div className="space-y-6 pt-2 animate-in fade-in duration-300">
+            <h3 className="font-black text-xl text-gray-800">依分類探索</h3>
+            <div className="space-y-4">
+               {['熱門推薦', '本週活動', '室內靜態', '戶外體能'].map(cat => (
+                 <div key={cat} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center active:bg-gray-50 transition">
+                    <span className="font-bold text-gray-700">{cat}</span>
+                    <i data-lucide="chevron-right" className="text-gray-300 w-5 h-5"></i>
+                 </div>
+               ))}
             </div>
           </div>
         );
 
-        const WalletView = () => (
-          <div className="pt-2 animate-in fade-in duration-300">
-            <div className="text-center py-10 bg-white rounded-[3rem] border border-gray-50 shadow-sm mb-8">
-              <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2">可提領總額</p>
-              <h2 className="text-5xl font-black text-gray-800 mb-8 tracking-tighter">$8,200</h2>
-              <button className="bg-[#FF8E72] text-white px-10 py-4 rounded-2xl font-black shadow-lg shadow-orange-100 active:scale-95 transition-all">立即提領收益</button>
+        // --- 訂單視圖 ---
+        const OrdersView = () => (
+          <div className="space-y-6 pt-2 animate-in fade-in duration-300">
+            <h3 className="font-black text-xl text-gray-800">我的訂單</h3>
+            <div className="flex gap-4 mb-4 border-b border-gray-100">
+                <button className="pb-3 border-b-2 border-[#FF8E72] text-[#FF8E72] font-black text-sm">即將開始</button>
+                <button className="pb-3 text-gray-400 font-bold text-sm">已完成</button>
+                <button className="pb-3 text-gray-400 font-bold text-sm">已取消</button>
             </div>
-            <div className="px-1 pb-4">
-                <div className="flex justify-between items-center mb-5">
-                    <h4 className="font-black text-gray-800">近期收支明細</h4>
-                    <span className="text-[10px] font-bold text-gray-400">查看更多</span>
-                </div>
-                <div className="space-y-4">
-                    <TransactionItem title="藝術工坊分潤入帳" date="今天 14:30" amount="+ $3,200" isPositive />
-                    <TransactionItem title="提領至 銀行帳戶" date="昨天 09:15" amount="- $5,000" />
-                    <TransactionItem title="冒險營隊分潤入帳" date="2026.03.20" amount="+ $4,500" isPositive />
-                </div>
+            
+            <div className="space-y-4">
+               <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm">
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="font-black text-gray-800">小小烘焙家體驗營</h4>
+                    <span className="text-[10px] font-black px-2 py-1 bg-green-50 text-green-500 rounded-lg">預約成功</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
+                    <i data-lucide="calendar" className="w-4 h-4"></i> 2026.04.12 (日) 14:00
+                  </div>
+                  <button className="w-full py-3 bg-gray-50 text-gray-600 rounded-2xl font-bold text-sm border border-gray-100 active:bg-gray-100">查看電子票券</button>
+               </div>
             </div>
           </div>
         );
 
-        const ProfilePlaceholder = () => (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4 text-center">
-             <div className="w-24 h-24 rounded-full bg-orange-50 border-4 border-white shadow-lg overflow-hidden">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Amy" alt="Avatar" />
+        // --- 個人視圖 ---
+        const ProfileView = () => (
+          <div className="pt-2 animate-in fade-in duration-300 text-center">
+             <div className="w-24 h-24 rounded-full bg-orange-50 border-4 border-white shadow-lg mx-auto mb-4 overflow-hidden">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Parent" alt="Avatar" />
              </div>
-             <div>
-                <h3 className="text-xl font-black text-gray-800">Amy 團媽</h3>
-                <p className="text-gray-400 text-sm font-bold mt-1">專業親子活動推廣專家</p>
+             <h3 className="text-xl font-black text-gray-800">家長 曉明</h3>
+             <p className="text-gray-400 text-xs font-bold mt-1">專屬點數：1,250 P</p>
+
+             <div className="grid grid-cols-2 gap-4 mt-8">
+                <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm">
+                   <i data-lucide="heart" className="w-6 h-6 text-red-400 mx-auto mb-2"></i>
+                   <p className="text-xs font-bold text-gray-500">我的收藏</p>
+                </div>
+                <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-sm">
+                   <i data-lucide="ticket" className="w-6 h-6 text-orange-400 mx-auto mb-2"></i>
+                   <p className="text-xs font-bold text-gray-500">優惠券</p>
+                </div>
              </div>
-             <div className="grid grid-cols-2 gap-4 w-full pt-8">
-                <div className="bg-white p-4 rounded-2xl border border-gray-50">
-                    <p className="text-xs text-gray-400 font-bold">累積訂單</p>
-                    <p className="text-lg font-black">1,248</p>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-50">
-                    <p className="text-xs text-gray-400 font-bold">好評率</p>
-                    <p className="text-lg font-black">99%</p>
-                </div>
+
+             <div className="mt-8 space-y-2">
+                <ProfileItem icon="settings" label="設定" />
+                <ProfileItem icon="help-circle" label="幫助與支援" />
+                <ProfileItem icon="log-out" label="登出" color="text-red-400" />
              </div>
           </div>
         );
 
-        // --- 核心 UI 組件 ---
+        // --- UI 組件 ---
 
         const NavBtn = ({ id, icon, label, active, set }) => (
           <button onClick={() => set(id)} className="flex flex-col items-center gap-1.5 transition-all outline-none">
@@ -240,31 +232,44 @@
           </button>
         );
 
-        const ActivityCard = ({ title, date, rate, hot }) => (
-          <div className="bg-white p-5 rounded-[2rem] border border-gray-50 shadow-sm flex justify-between items-center active:bg-orange-50/50 transition-colors cursor-pointer group">
-            <div className="flex-1">
-              <h4 className="font-black text-sm text-gray-800 mb-1 group-active:text-[#FF8E72] transition-colors">{title}</h4>
-              <p className="text-[10px] text-gray-400 font-bold">{date} • 預計佣金分潤 {rate}</p>
+        const CategoryBtn = ({ icon, label, color, text }) => (
+            <div className="flex flex-col items-center gap-2 active:scale-90 transition cursor-pointer">
+                <div className={`w-12 h-12 ${color} ${text} rounded-2xl flex items-center justify-center shadow-sm`}>
+                    <i data-lucide={icon} className="w-6 h-6"></i>
+                </div>
+                <span className="text-[10px] font-black text-gray-500">{label}</span>
             </div>
-            <div className="flex items-center gap-2">
-                {hot && <span className="bg-orange-100 text-[#FF8E72] text-[9px] font-black px-2.5 py-1 rounded-full uppercase">熱門</span>}
-                <i data-lucide="chevron-right" className="text-gray-300 w-4 h-4"></i>
-            </div>
-          </div>
         );
 
-        const TransactionItem = ({ title, date, amount, isPositive }) => (
-            <div className="flex justify-between items-center p-5 bg-white rounded-3xl border border-gray-50 shadow-sm active:bg-gray-50 transition">
-                <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-xl ${isPositive ? 'bg-green-50 text-green-500' : 'bg-gray-50 text-gray-400'}`}>
-                        <i data-lucide={isPositive ? "arrow-down-left" : "arrow-up-right"} className="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <p className="font-bold text-sm text-gray-800">{title}</p>
-                        <p className="text-[10px] text-gray-400 mt-1 font-bold">{date}</p>
+        const ActivityCard = ({ img, title, location, price, tag }) => (
+            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-50 shadow-sm active:scale-[0.98] transition group">
+                <div className="h-48 relative overflow-hidden">
+                    <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt={title} />
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
+                        <span className="text-[10px] font-black text-[#FF8E72]">{tag}</span>
                     </div>
                 </div>
-                <p className={`font-black text-sm ${isPositive ? 'text-green-500' : 'text-gray-800'}`}>{amount}</p>
+                <div className="p-6">
+                    <h4 className="font-black text-lg text-gray-800 mb-2">{title}</h4>
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1 text-gray-400 text-xs">
+                            <i data-lucide="map-pin" className="w-3 h-3"></i> {location}
+                        </div>
+                        <div className="text-[#FF8E72] font-black">
+                            <span className="text-xs">TWD</span> <span className="text-xl">{price}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ProfileItem = ({ icon, label, color = "text-gray-600" }) => (
+            <div className={`flex justify-between items-center p-5 bg-white rounded-3xl border border-gray-50 active:bg-gray-50 transition cursor-pointer`}>
+                <div className="flex items-center gap-4">
+                    <i data-lucide={icon} className={`w-5 h-5 ${color}`}></i>
+                    <span className={`font-bold text-sm ${color}`}>{label}</span>
+                </div>
+                <i data-lucide="chevron-right" className="text-gray-300 w-4 h-4"></i>
             </div>
         );
 
